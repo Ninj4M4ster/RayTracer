@@ -19,5 +19,11 @@ run: build
 run-release: release
 	./$(RELEASE_DIR)/RayTracer
 
+ut: build
+	ctest --test-dir $(DEBUG_DIR) --output-on-failure
+
+ut-release: release
+	ctest --test-dir $(RELEASE_DIR) --output-on-failure
+
 clean:
 	rm -rf $(PROJECT)/build

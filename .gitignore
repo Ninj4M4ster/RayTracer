@@ -6,3 +6,5 @@
 *.fatbin
 
 ray-tracer/build
+
+.vscode
