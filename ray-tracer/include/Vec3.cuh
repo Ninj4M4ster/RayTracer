@@ -77,3 +77,5 @@ bool operator==(const Vec3<T> &l, const Vec3<T> &r)
 {
     return l.x == r.x && l.y == r.y && l.z == r.z;
 }
+
+using ScalarVector3 = Vec3<float>;

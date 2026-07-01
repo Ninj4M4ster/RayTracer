@@ -10,13 +10,10 @@
 
 #include <iostream>
 
-using ScalarVector3 = Vec3<float>;
-
 class Camera
 {
 public:
-    template <typename T>
-    explicit Camera(const Vec3<T> origin, const Quaternion orientation, const CameraSettings settings)
+    explicit Camera(const ScalarVector3 origin, const Quaternion orientation, const CameraSettings settings)
         : origin{origin},
           orientation{orientation},
           forwardVec{this->orientation.rotate({0., 0., -1.})},
@@ -29,7 +26,8 @@ public:
         viewportWidth = aspectRatio * viewportHeight;
     }
 
-    Ray<float> generateRay(std::uint32_t x, std::uint32_t y);
+    Ray generateRay(std::uint32_t x, std::uint32_t y);
+    std::vector<Ray> generateAllImageRays();
 
 private:
     ScalarVector3 origin;

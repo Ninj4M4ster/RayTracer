@@ -1,7 +1,7 @@
 #include <Camera.cuh>
 #include <assert.h>
 
-Ray<float> Camera::generateRay(std::uint32_t x, std::uint32_t y)
+Ray Camera::generateRay(std::uint32_t x, std::uint32_t y)
 {
     assert(x < cameraSettings.width);
     assert(y < cameraSettings.height);
@@ -19,5 +19,20 @@ Ray<float> Camera::generateRay(std::uint32_t x, std::uint32_t y)
     ScalarVector3 rayDirection =
         (imagePoint - origin).normalized();
 
-    return Ray<float>{origin, rayDirection};
+    return Ray{origin, rayDirection};
+}
+
+std::vector<Ray> Camera::generateAllImageRays()
+{
+    std::vector<Ray> rays(cameraSettings.width * cameraSettings.height);
+
+    for (std::uint32_t y = 0; y < cameraSettings.height; ++y)
+    {
+        for (std::uint32_t x = 0; x < cameraSettings.width; ++x)
+        {
+            rays.push_back(generateRay(x, y));
+        }
+    }
+
+    return rays;
 }

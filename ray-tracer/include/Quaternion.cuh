@@ -2,8 +2,6 @@
 
 #include <Vec3.cuh>
 
-using ScalarVector3 = Vec3<float>;
-
 struct Quaternion
 {
     ScalarVector3 rotate(const ScalarVector3 rotator)
