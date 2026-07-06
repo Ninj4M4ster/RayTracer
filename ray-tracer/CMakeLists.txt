@@ -18,7 +18,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CUDA_ARCHITECTURES native)
 
 # Library
-add_library(raytracer STATIC 
+add_library(raytracer STATIC
+    src/objects/Sphere.cu
     src/Camera.cu
     src/CpuRenderer.cu
 )

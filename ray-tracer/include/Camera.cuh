@@ -26,7 +26,7 @@ public:
         viewportWidth = aspectRatio * viewportHeight;
     }
 
-    Ray generateRay(std::uint32_t x, std::uint32_t y);
+    Ray generateRay(std::uint32_t x, std::uint32_t y) const;
     std::vector<Ray> generateAllImageRays();
 
 private:

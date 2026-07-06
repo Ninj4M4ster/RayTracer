@@ -1,4 +1,5 @@
 #include <CpuRenderer.cuh>
+#include <limits>
 
 void CpuRenderer::render(FrameBuffer &frameBuffer, const Scene &scene, const Camera &camera)
 {
@@ -6,14 +7,29 @@ void CpuRenderer::render(FrameBuffer &frameBuffer, const Scene &scene, const Cam
     {
         for (std::uint32_t x = 0; x < frameBuffer.width; ++x)
         {
-            // Uncomment after implementing collisions
-            // camera.generateRay(x, y);
+            auto ray = camera.generateRay(x, y);
+            std::optional<float> min_t = std::nullopt;
+            for (const auto &obj : scene.getObjects())
+            {
+                auto t_opt = obj->intersect(ray);
+                if (!min_t.has_value())
+                {
+                    min_t = t_opt;
+                }
+                else if (t_opt && *t_opt < *min_t)
+                {
+                    min_t = t_opt;
+                }
+            }
 
-            float r = static_cast<float>(x) / frameBuffer.width;
-            float g = static_cast<float>(y) / frameBuffer.height;
-            float b = 0.5f;
-
-            frameBuffer.pixels[y * frameBuffer.width + x] = Color(r, g, b);
+            if (min_t)
+            {
+                frameBuffer.pixels[y * frameBuffer.width + x] = Color(50.0 / 255.0, 50.0 / 255.0, 50.0 / 255.0);
+            }
+            else
+            {
+                frameBuffer.pixels[y * frameBuffer.width + x] = Color(192.0 / 255.0, 210.0 / 255.0, 240.0 / 255.0);
+            }
         }
     }
 }

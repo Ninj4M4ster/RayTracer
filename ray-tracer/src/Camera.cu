@@ -1,7 +1,7 @@
 #include <Camera.cuh>
 #include <assert.h>
 
-Ray Camera::generateRay(std::uint32_t x, std::uint32_t y)
+Ray Camera::generateRay(std::uint32_t x, std::uint32_t y) const
 {
     assert(x < cameraSettings.width);
     assert(y < cameraSettings.height);

@@ -7,16 +7,20 @@
 #include <Scene.cuh>
 #include <CpuRenderer.cuh>
 #include <imageUtils/stb_image_write.h>
+#include <objects/Sphere.cuh>
 
 int main()
 {
-    ScalarVector3 origin{0.0, 0.0, 0.0};
+    ScalarVector3 cameraOrigin{0.0, 0.0, 0.0};
     Quaternion orientation{1.0, {0.0, 0.0, 0.0}};
     CameraSettings settings{1920, 1080, M_PI / 2.0};
-    Camera cam{origin, orientation, settings};
+    Camera cam{cameraOrigin, orientation, settings};
 
     FrameBuffer framebuffer{settings.width, settings.height};
-    Scene scene;
+    Scene scene{
+        {std::make_shared<Sphere>(ScalarVector3{0.0, 0.0, -5.0}, orientation, 1.0),
+         std::make_shared<Sphere>(ScalarVector3{2.0, 0.0, -5.0}, orientation, 1.0),
+         std::make_shared<Sphere>(ScalarVector3{-2.0, 0.0, -5.0}, orientation, 1.0)}};
     CpuRenderer renderer;
 
     renderer.render(framebuffer, scene, cam);

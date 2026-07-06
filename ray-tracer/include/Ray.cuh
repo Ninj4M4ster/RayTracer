@@ -8,6 +8,11 @@ struct Ray
     Ray() = default;
     Ray(ScalarVector3 origin, ScalarVector3 direction) : origin(origin), direction(direction) {}
 
+    ScalarVector3 pointOfIntersection(float t)
+    {
+        return origin + t * direction;
+    }
+
     ScalarVector3 origin;
     ScalarVector3 direction;
 };

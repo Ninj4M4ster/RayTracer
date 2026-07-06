@@ -21,7 +21,12 @@ public:
         return *this / length();
     }
 
-    Vec3 crossProduct(const Vec3 &r)
+    float dot(const Vec3 &r) const
+    {
+        return {x * r.x + y * r.y + z * r.z};
+    }
+
+    Vec3 crossProduct(const Vec3 &r) const
     {
         return {y * r.z - z * r.y, z * r.x - x * r.z, x * r.y - y * r.x};
     }
