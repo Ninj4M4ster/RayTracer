@@ -9,6 +9,5 @@ public:
     virtual ~Sphere() = default;
     std::optional<float> intersect(const Ray &ray) override;
 
-private:
     float radius;
 };

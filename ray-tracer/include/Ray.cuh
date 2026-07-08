@@ -1,14 +1,18 @@
 #pragma once
 
+#include <CudaCompat.cuh>
 #include <Vec3.cuh>
 #include <ostream>
 
 struct Ray
 {
     Ray() = default;
+    RT_HD
     Ray(ScalarVector3 origin, ScalarVector3 direction) : origin(origin), direction(direction) {}
 
-    ScalarVector3 pointOfIntersection(float t)
+    RT_HD
+    ScalarVector3
+    pointOfIntersection(float t)
     {
         return origin + t * direction;
     }

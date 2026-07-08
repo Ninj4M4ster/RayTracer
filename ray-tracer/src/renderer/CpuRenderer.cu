@@ -1,4 +1,4 @@
-#include <CpuRenderer.cuh>
+#include <renderer/CpuRenderer.cuh>
 #include <limits>
 
 void CpuRenderer::render(FrameBuffer &frameBuffer, const Scene &scene, const Camera &camera)

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Renderer.cuh>
+#include <renderer/IRenderer.cuh>
 
-class CpuRenderer : public Renderer
+class CpuRenderer : public IRenderer
 {
 public:
     void render(FrameBuffer &, const Scene &, const Camera &) override;

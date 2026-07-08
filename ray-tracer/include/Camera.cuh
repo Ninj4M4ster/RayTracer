@@ -1,5 +1,6 @@
 #pragma once
 
+#include <CudaCompat.cuh>
 #include <cstdint>
 #include <Vec3.cuh>
 #include <Quaternion.cuh>
@@ -13,7 +14,7 @@
 class Camera
 {
 public:
-    explicit Camera(const ScalarVector3 origin, const Quaternion orientation, const CameraSettings settings)
+    RT_HD explicit Camera(const ScalarVector3 origin, const Quaternion orientation, const CameraSettings settings)
         : origin{origin},
           orientation{orientation},
           forwardVec{this->orientation.rotate({0., 0., -1.})},
@@ -22,11 +23,13 @@ public:
           cameraSettings{settings}
     {
         aspectRatio = static_cast<double>(cameraSettings.width) / static_cast<double>(cameraSettings.height);
-        viewportHeight = 2.0 * std::tan(cameraSettings.fov / 2.0);
+        viewportHeight = 2.0 * tanf(cameraSettings.fov / 2.0);
         viewportWidth = aspectRatio * viewportHeight;
     }
 
-    Ray generateRay(std::uint32_t x, std::uint32_t y) const;
+    RT_HD
+    Ray
+    generateRay(std::uint32_t x, std::uint32_t y) const;
     std::vector<Ray> generateAllImageRays();
 
 private:
@@ -38,7 +41,7 @@ private:
     ScalarVector3 upVec;
 
     CameraSettings cameraSettings;
-    double aspectRatio;
-    double viewportHeight;
-    double viewportWidth;
+    float aspectRatio;
+    float viewportHeight;
+    float viewportWidth;
 };

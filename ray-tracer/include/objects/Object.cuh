@@ -13,7 +13,6 @@ public:
 
     virtual std::optional<float> intersect(const Ray &ray) = 0;
 
-protected:
     ScalarVector3 position;
     Quaternion orientation;
 };

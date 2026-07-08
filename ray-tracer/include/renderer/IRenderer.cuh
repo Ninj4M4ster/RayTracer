@@ -4,7 +4,7 @@
 #include <Scene.cuh>
 #include <Camera.cuh>
 
-class Renderer
+class IRenderer
 {
 public:
     virtual void render(FrameBuffer &, const Scene &, const Camera &) = 0;

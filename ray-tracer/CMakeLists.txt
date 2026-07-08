@@ -19,9 +19,11 @@ set(CMAKE_CUDA_ARCHITECTURES native)
 
 # Library
 add_library(raytracer STATIC
+    src/gpuObjects/GpuSphere.cu
     src/objects/Sphere.cu
     src/Camera.cu
-    src/CpuRenderer.cu
+    src/renderer/CpuRenderer.cu
+    src/renderer/GpuRenderer.cu
 )
 
 target_include_directories(raytracer

@@ -1,12 +1,11 @@
 #include <Camera.cuh>
 #include <assert.h>
 
+RT_HD
 Ray Camera::generateRay(std::uint32_t x, std::uint32_t y) const
 {
-    assert(x < cameraSettings.width);
-    assert(y < cameraSettings.height);
-    auto u = (static_cast<double>(x) + 0.5) / static_cast<double>(cameraSettings.width);
-    auto v = (static_cast<double>(y) + 0.5) / static_cast<double>(cameraSettings.height);
+    auto u = (static_cast<float>(x) + 0.5) / static_cast<float>(cameraSettings.width);
+    auto v = (static_cast<float>(y) + 0.5) / static_cast<float>(cameraSettings.height);
     auto px = (2.0 * u - 1.0) * viewportWidth / 2.0;
     auto py = (1.0 - 2.0 * v) * viewportHeight / 2.0;
 
