@@ -5,9 +5,10 @@
 class Sphere : public Object
 {
 public:
-    explicit Sphere(ScalarVector3 position, Quaternion orientation, float radius) : Object(position, orientation), radius(radius) {}
+    explicit Sphere(ScalarVector3 position, Quaternion orientation, Color color, float radius)
+        : Object(position, orientation, color), radius(radius) {}
     virtual ~Sphere() = default;
-    std::optional<float> intersect(const Ray &ray) override;
+    bool intersect(const Ray &ray, float &t, ScalarVector3 &normal) override;
 
     float radius;
 };

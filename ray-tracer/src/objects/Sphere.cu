@@ -1,6 +1,6 @@
 #include <objects/Sphere.cuh>
 
-std::optional<float> Sphere::intersect(const Ray &ray)
+bool Sphere::intersect(const Ray &ray, float &t, ScalarVector3 &normal)
 {
     ScalarVector3 L = ray.origin - position;
     float a = ray.direction.dot(ray.direction);
@@ -12,7 +12,9 @@ std::optional<float> Sphere::intersect(const Ray &ray)
         delta = sqrt(delta);
         float t1 = (-b - delta) / (2.0 * a);
         float t2 = (-b + delta) / (2.0 * a);
-        return std::min(t1, t2);
+        t = std::min(t1, t2);
+        normal = (ray.pointOfIntersection(t) - position) / radius;
+        return true;
     }
-    return std::nullopt;
+    return false;
 }

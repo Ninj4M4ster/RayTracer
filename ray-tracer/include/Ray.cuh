@@ -12,7 +12,7 @@ struct Ray
 
     RT_HD
     ScalarVector3
-    pointOfIntersection(float t)
+    pointOfIntersection(float t) const
     {
         return origin + t * direction;
     }
