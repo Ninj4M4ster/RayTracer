@@ -11,7 +11,12 @@
 #include <imageUtils/stb_image_write.h>
 #include <objects/Sphere.cuh>
 
-int main()
+#include <QApplication>
+#include <QPushButton>
+#include <QLabel>
+#include <QImage>
+
+int main(int argc, char **argv)
 {
     ScalarVector3 cameraOrigin{0.0, 0.0, 0.0};
     Quaternion orientation{1.0, {0.0, 0.0, 0.0}};
@@ -60,5 +65,18 @@ int main()
     //     settings.width * 3 // stride
     // );
 
-    return 0;
+    QApplication app(argc, argv);
+
+    QImage image(
+        framebuffer.data(),
+        settings.width,
+        settings.height,
+        settings.width * 3,
+        QImage::Format_RGB888);
+
+    QLabel label;
+    label.setPixmap(QPixmap::fromImage(image));
+    label.show();
+
+    return app.exec();
 }

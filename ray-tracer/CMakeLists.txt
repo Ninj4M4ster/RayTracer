@@ -17,6 +17,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CUDA_ARCHITECTURES native)
 
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+# find_package(Qt6 6.5 COMPONENTS Quick REQUIRED)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 # Library
 add_library(raytracer STATIC
     src/gpuObjects/GpuSphere.cu
@@ -44,13 +51,16 @@ set_target_properties(raytracer PROPERTIES
 )
 
 # Executable
-add_executable(RayTracer
+qt_add_executable(RayTracer
     src/main.cu
 )
 
 target_link_libraries(RayTracer
     PRIVATE
         raytracer
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
 )
 
 set_target_properties(RayTracer PROPERTIES
