@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <Vec3.cuh>
+#include <math/Vec3.cuh>
 
 TEST(TestVec, Addition)
 {

@@ -1,4 +1,4 @@
-PROJECT := ray-tracer
+PROJECT := app
 
 DEBUG_DIR := $(PROJECT)/build/debug
 RELEASE_DIR := $(PROJECT)/build/release
@@ -14,10 +14,10 @@ release:
 	cmake --build $(RELEASE_DIR)
 
 run: build
-	./$(DEBUG_DIR)/RayTracer
+	./$(DEBUG_DIR)/bin/RayTracer
 
 run-release: release
-	./$(RELEASE_DIR)/RayTracer
+	./$(RELEASE_DIR)/bin/RayTracer
 
 ut: build
 	ctest --test-dir $(DEBUG_DIR) --output-on-failure

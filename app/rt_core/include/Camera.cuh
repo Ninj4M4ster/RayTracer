@@ -2,10 +2,10 @@
 
 #include <CudaCompat.cuh>
 #include <cstdint>
-#include <Vec3.cuh>
-#include <Quaternion.cuh>
+#include <math/Vec3.cuh>
+#include <math/Quaternion.cuh>
 #include <CameraSettings.cuh>
-#include <Ray.cuh>
+#include <math/Ray.cuh>
 #include <vector>
 #include <cmath>
 

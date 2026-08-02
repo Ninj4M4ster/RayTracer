@@ -1,7 +1,7 @@
 #pragma once
 
 #include <CudaCompat.cuh>
-#include <Vec3.cuh>
+#include <math/Vec3.cuh>
 #include <ostream>
 
 struct Ray

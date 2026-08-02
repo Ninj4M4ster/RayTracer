@@ -10,7 +10,7 @@ target_include_directories(raytracer_tests
 
 target_link_libraries(raytracer_tests
     PRIVATE
-        raytracer
+        raytracer_core
         GTest::gtest_main
         gmock_main
 )

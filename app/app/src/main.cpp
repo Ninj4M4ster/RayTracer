@@ -1,7 +1,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 
 #include <iostream>
-#include <Vec3.cuh>
+#include <math/Vec3.cuh>
 #include <Camera.cuh>
 #include <FrameBuffer.cuh>
 #include <Scene.cuh>

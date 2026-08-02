@@ -5,6 +5,6 @@
 *.cubin
 *.fatbin
 
-ray-tracer/build
+app/build
 
 .vscode

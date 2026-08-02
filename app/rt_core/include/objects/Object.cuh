@@ -1,8 +1,8 @@
 #pragma once
 
-#include <Vec3.cuh>
-#include <Quaternion.cuh>
-#include <Ray.cuh>
+#include <math/Vec3.cuh>
+#include <math/Quaternion.cuh>
+#include <math/Ray.cuh>
 #include <Color.cuh>
 #include <optional>
 

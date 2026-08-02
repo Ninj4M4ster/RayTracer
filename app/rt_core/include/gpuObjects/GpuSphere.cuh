@@ -1,8 +1,8 @@
 #pragma once
 
 #include <CudaCompat.cuh>
-#include <Vec3.cuh>
-#include <Ray.cuh>
+#include <math/Vec3.cuh>
+#include <math/Ray.cuh>
 
 struct GpuSphere
 {
