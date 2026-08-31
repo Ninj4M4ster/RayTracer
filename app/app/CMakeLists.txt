@@ -3,11 +3,10 @@ qt_add_executable(RayTracer
 )
 
 target_link_libraries(RayTracer
+    PUBLIC
+        rt_gui
     PRIVATE
-        raytracer_core     
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Widgets
+        rt_core
 )
 
 set_target_properties(RayTracer PROPERTIES

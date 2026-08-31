@@ -42,4 +42,5 @@ FetchContent_MakeAvailable(googletest)
 
 # Project files and libraries
 add_subdirectory(rt_core)
+add_subdirectory(gui)
 add_subdirectory(app)
