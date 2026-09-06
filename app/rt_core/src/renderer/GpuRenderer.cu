@@ -51,35 +51,96 @@ RT_G void renderPixel(
     }
 }
 
-void GpuRenderer::render(FrameBuffer &frameBuffer, const GpuScene &scene, const Camera &camera)
+void GpuRenderer::render(
+    FrameBuffer &frameBuffer,
+    const GpuScene &scene,
+    const Camera &camera)
 {
-    Color *deviceFrameBuffer;
-    const std::size_t frameBufferSize{frameBuffer.height * frameBuffer.width * sizeof(Color)};
-    cudaMalloc(&deviceFrameBuffer, frameBufferSize);
+    Color *deviceFrameBuffer = nullptr;
+
+    const std::size_t frameBufferSize =
+        static_cast<std::size_t>(frameBuffer.width) *
+        frameBuffer.height *
+        sizeof(Color);
+
+    cudaError_t err;
+
+    err = cudaMalloc(
+        reinterpret_cast<void **>(&deviceFrameBuffer),
+        frameBufferSize);
+
+    if (err != cudaSuccess)
+    {
+        std::cerr << "cudaMalloc: "
+                  << cudaGetErrorString(err) << '\n';
+        return;
+    }
 
     constexpr int threads = 256;
-    const int pixels = frameBuffer.width * frameBuffer.height;
-    const int blocks = (pixels + threads - 1) / threads;
+
+    const int pixels =
+        frameBuffer.width * frameBuffer.height;
+
+    const int blocks =
+        (pixels + threads - 1) / threads;
+
+    std::cout
+        << "Launching kernel: "
+        << blocks << " blocks, "
+        << threads << " threads, "
+        << pixels << " pixels\n";
+
     renderPixel<<<blocks, threads>>>(
         deviceFrameBuffer,
         frameBuffer.width,
         frameBuffer.height,
         scene,
         camera);
-    cudaError_t err = cudaGetLastError();
-    if (err != cudaSuccess)
-    {
-        std::cerr << cudaGetErrorString(err) << '\n';
-    }
 
-    cudaDeviceSynchronize();
-
+    // Check launch itself.
     err = cudaGetLastError();
+
     if (err != cudaSuccess)
     {
-        std::cerr << cudaGetErrorString(err) << '\n';
-    }
-    cudaMemcpy(frameBuffer.pixels.data(), deviceFrameBuffer, frameBufferSize, cudaMemcpyDefault);
+        std::cerr << "Kernel launch: "
+                  << cudaGetErrorString(err) << '\n';
 
-    cudaFree(deviceFrameBuffer);
+        cudaFree(deviceFrameBuffer);
+        return;
+    }
+
+    // Check execution.
+    err = cudaDeviceSynchronize();
+
+    if (err != cudaSuccess)
+    {
+        std::cerr << "Kernel execution: "
+                  << cudaGetErrorString(err) << '\n';
+
+        cudaFree(deviceFrameBuffer);
+        return;
+    }
+
+    err = cudaMemcpy(
+        frameBuffer.pixels.data(),
+        deviceFrameBuffer,
+        frameBufferSize,
+        cudaMemcpyDeviceToHost);
+
+    if (err != cudaSuccess)
+    {
+        std::cerr << "cudaMemcpy: "
+                  << cudaGetErrorString(err) << '\n';
+
+        cudaFree(deviceFrameBuffer);
+        return;
+    }
+
+    err = cudaFree(deviceFrameBuffer);
+
+    if (err != cudaSuccess)
+    {
+        std::cerr << "cudaFree: "
+                  << cudaGetErrorString(err) << '\n';
+    }
 }

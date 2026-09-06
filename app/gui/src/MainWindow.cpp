@@ -8,4 +8,5 @@ MainWindow::MainWindow() : renderController(this), centralLabel{nullptr} {
 
 void MainWindow::display(QImage image) {
     centralLabel->setPixmap(QPixmap::fromImage(image));
+    emit displayed();
 }

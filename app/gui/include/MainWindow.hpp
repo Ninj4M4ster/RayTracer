@@ -13,6 +13,8 @@ public:
 public slots:
     void display(QImage image);
 
+signals:
+    void displayed();
 private:
     RenderController renderController;
     QLabel *centralLabel;

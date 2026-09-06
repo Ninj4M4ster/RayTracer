@@ -1,4 +1,5 @@
 #include <GpuScene.cuh>
+#include <objects/Sphere.cuh>
 
 GpuScene::GpuScene(const Scene &scene)
 {
@@ -10,20 +11,29 @@ GpuScene::GpuScene(const Scene &scene)
         {
             gpuSpheres.push_back({sphere->position,
                                   sphere->radius});
-            sphereCount++;
+
+            ++sphereCount;
         }
     }
 
-    cudaMalloc(&spheres,
-               gpuSpheres.size() * sizeof(GpuSphere));
+    cudaMalloc(
+        &spheres,
+        gpuSpheres.size() * sizeof(GpuSphere));
 
-    cudaMemcpy(spheres,
-               gpuSpheres.data(),
-               gpuSpheres.size() * sizeof(GpuSphere),
-               cudaMemcpyHostToDevice);
+    cudaMemcpy(
+        spheres,
+        gpuSpheres.data(),
+        gpuSpheres.size() * sizeof(GpuSphere),
+        cudaMemcpyHostToDevice);
 }
 
-RT_HD GpuScene::~GpuScene()
+void GpuScene::free()
 {
-    cudaFree(spheres);
+    if (spheres)
+    {
+        cudaFree(spheres);
+        spheres = nullptr;
+    }
+
+    sphereCount = 0;
 }

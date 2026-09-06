@@ -12,6 +12,13 @@ RenderController::RenderController(MainWindow* parent)
         &renderingThread,
         &QThread::started,
         worker.get(),
+        &RenderWorker::initialize
+    );
+
+    connect(
+        worker.get(),
+        &RenderWorker::initialized,
+        worker.get(),
         &RenderWorker::render
     );
 
@@ -20,6 +27,13 @@ RenderController::RenderController(MainWindow* parent)
         &RenderWorker::finished,
         mainWindow,
         &MainWindow::display
+    );
+
+    connect(
+        mainWindow,
+        &MainWindow::displayed,
+        worker.get(),
+        &RenderWorker::render
     );
 
     renderingThread.start();

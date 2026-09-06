@@ -2,6 +2,7 @@
 #include <renderer/CpuRenderer.cuh>
 
 #include <QImage>
+#include <random>
 
 #include <math/Vec3.cuh>
 #include <Camera.cuh>
@@ -13,9 +14,16 @@
 #include <imageUtils/stb_image_write.h>
 #include <objects/Sphere.cuh>
 
-void RenderWorker::render()
+void RenderWorker::initialize()
 {
-    ScalarVector3 cameraOrigin{0.0, 0.0, 0.0};
+    gpuRenderer = std::make_unique<GpuRenderer>();
+
+    emit initialized();
+}
+
+void RenderWorker::render() {
+    auto rand = (double)std::rand() / (RAND_MAX + 1.0);
+    ScalarVector3 cameraOrigin{0.0, 0.0, rand};
     Quaternion orientation{1.0, {0.0, 0.0, 0.0}};
     CameraSettings settings{1920, 1080, M_PI / 2.0};
     Camera cam{cameraOrigin, orientation, settings};
@@ -37,10 +45,11 @@ void RenderWorker::render()
     ScalarVector3 lightOrigin{20.0, 20.0, 20.0};
     scene.addLight(std::make_shared<Light>(lightOrigin));
 
-    renderer = std::make_unique<CpuRenderer>();
+    GpuScene gpuScene{scene};
+
     try
     {
-        renderer->render(framebuffer, scene, cam);
+        gpuRenderer->render(framebuffer, gpuScene, cam);
 
         // QImage image(
         //     framebuffer.data(),
@@ -64,4 +73,5 @@ void RenderWorker::render()
     {
         emit error("Rendering failed");
     }
+    gpuScene.free();
 }
