@@ -1,5 +1,6 @@
 #include <renderer/CpuRenderer.cuh>
 #include <limits>
+#include <objects/Sphere.cuh>
 
 void CpuRenderer::render(FrameBuffer &frameBuffer, const Scene &scene, const Camera &camera)
 {
@@ -16,7 +17,7 @@ void CpuRenderer::render(FrameBuffer &frameBuffer, const Scene &scene, const Cam
             {
                 float t;
                 ScalarVector3 normal;
-                if (obj->intersect(ray, t, normal))
+                if (static_cast<Sphere *>(obj.get())->intersect(ray, t, normal))
                 {
                     hit_flag = true;
                     if (t > 0 && t < min_t)

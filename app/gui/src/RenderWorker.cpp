@@ -17,6 +17,7 @@
 void RenderWorker::initialize()
 {
     gpuRenderer = std::make_unique<GpuRenderer>();
+    renderer = std::make_unique<CpuRenderer>();
 
     emit initialized();
 }
@@ -50,6 +51,7 @@ void RenderWorker::render() {
     try
     {
         gpuRenderer->render(framebuffer, gpuScene, cam);
+        // renderer->render(framebuffer, scene, cam);
 
         // QImage image(
         //     framebuffer.data(),
@@ -73,5 +75,5 @@ void RenderWorker::render() {
     {
         emit error("Rendering failed");
     }
-    gpuScene.free();
+    // gpuScene.free();
 }

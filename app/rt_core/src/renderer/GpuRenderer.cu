@@ -22,25 +22,43 @@ RT_G void renderPixel(
     auto ray = camera.generateRay(x, y);
 
     float min_t = 100000000.0f;
+    ScalarVector3 minNormal;
+    Sphere *minObject;
     bool hit = false;
 
-    for (int i = 0; i < scene.sphereCount; ++i)
+    if (scene.spheres)
     {
-        float t;
-
-        if (scene.spheres[i].intersect(ray, t) && t < min_t)
+        for (int i = 0; i < scene.sphereCount; ++i)
         {
-            min_t = t;
-            hit = true;
+            float t;
+            ScalarVector3 normal;
+            if (scene.spheres[i].intersect(ray, t, normal) && t > 0 && t < min_t)
+            {
+                hit = true;
+                minNormal = normal;
+                min_t = t;
+                minObject = &scene.spheres[i];
+            }
         }
     }
 
     if (hit)
     {
-        frameBuff[workIndex] =
-            Color(50.0f / 255.0f,
-                  50.0f / 255.0f,
-                  50.0f / 255.0f);
+        const auto light = scene.getLight();
+        if (light)
+        {
+            const auto hitPose = ray.pointOfIntersection(min_t);
+            const auto dirToLight = ((light->position - hitPose) / (light->position - hitPose).length()).normalized();
+            const auto intensity = std::max(0.0f, minNormal.dot(dirToLight));
+            frameBuff[workIndex] = intensity * minObject->color;
+        }
+        else
+        {
+            frameBuff[workIndex] =
+                Color(50.0f / 255.0f,
+                      50.0f / 255.0f,
+                      50.0f / 255.0f);
+        }
     }
     else
     {

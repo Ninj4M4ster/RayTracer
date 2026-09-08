@@ -1,5 +1,4 @@
 add_library(rt_core STATIC
-    src/gpuObjects/GpuSphere.cu
     src/objects/Sphere.cu
     src/Camera.cu
     src/GpuScene.cu
