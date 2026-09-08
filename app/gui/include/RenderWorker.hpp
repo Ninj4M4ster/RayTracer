@@ -3,15 +3,17 @@
 #include <QObject>
 #include <renderer/IRenderer.cuh>
 #include <renderer/GpuRenderer.cuh>
+#include <QSize>
 
 class RenderWorker : public QObject {
     Q_OBJECT
 public:
-    RenderWorker() = default;
+    explicit RenderWorker(const QSize parentWindowSize);
 
 public slots:
     void initialize();
     void render();
+    void resizeWindow(const QSize);
 
 signals:
     void initialized();
@@ -22,4 +24,6 @@ signals:
 private:
     std::unique_ptr<IRenderer> renderer;
     std::unique_ptr<GpuRenderer> gpuRenderer;
+    CameraSettings cameraSettings;
+    Camera camera;
 };

@@ -27,6 +27,14 @@ public:
         viewportWidth = aspectRatio * viewportHeight;
     }
 
+    void updateCameraSettings(const CameraSettings settings)
+    {
+        cameraSettings = settings;
+        aspectRatio = static_cast<double>(cameraSettings.width) / static_cast<double>(cameraSettings.height);
+        viewportHeight = 2.0 * tanf(cameraSettings.fov / 2.0);
+        viewportWidth = aspectRatio * viewportHeight;
+    }
+
     RT_HD
     Ray
     generateRay(std::uint32_t x, std::uint32_t y) const;

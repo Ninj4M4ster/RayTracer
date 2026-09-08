@@ -14,6 +14,13 @@
 #include <imageUtils/stb_image_write.h>
 #include <objects/Sphere.cuh>
 
+RenderWorker::RenderWorker(const QSize parentWindowSize)
+    : cameraSettings{parentWindowSize.width(), parentWindowSize.height(), M_PI / 2.0},
+      camera{ScalarVector3{0.0, 0.0, (double)std::rand() / (RAND_MAX + 1.0)},
+             Quaternion{1.0, {0.0, 0.0, 0.0}},
+             cameraSettings} {
+}
+
 void RenderWorker::initialize()
 {
     gpuRenderer = std::make_unique<GpuRenderer>();
@@ -23,13 +30,8 @@ void RenderWorker::initialize()
 }
 
 void RenderWorker::render() {
-    auto rand = (double)std::rand() / (RAND_MAX + 1.0);
-    ScalarVector3 cameraOrigin{0.0, 0.0, rand};
+    FrameBuffer framebuffer{cameraSettings.width, cameraSettings.height};
     Quaternion orientation{1.0, {0.0, 0.0, 0.0}};
-    CameraSettings settings{1920, 1080, M_PI / 2.0};
-    Camera cam{cameraOrigin, orientation, settings};
-
-    FrameBuffer framebuffer{settings.width, settings.height};
     Scene scene{
         {std::make_shared<Sphere>(ScalarVector3{0.0, 0.0, -5.0},
                                   orientation,
@@ -50,7 +52,7 @@ void RenderWorker::render() {
 
     try
     {
-        gpuRenderer->render(framebuffer, gpuScene, cam);
+        gpuRenderer->render(framebuffer, gpuScene, camera);
         // renderer->render(framebuffer, scene, cam);
 
         // QImage image(
@@ -63,9 +65,9 @@ void RenderWorker::render() {
 
         QImage image(
             framebuffer.data(),
-            settings.width,
-            settings.height,
-            settings.width * 3,
+            cameraSettings.width,
+            cameraSettings.height,
+            cameraSettings.width * 3,
             QImage::Format_RGB888);
 
 
@@ -75,5 +77,11 @@ void RenderWorker::render() {
     {
         emit error("Rendering failed");
     }
-    // gpuScene.free();
+    gpuScene.free();
+}
+
+void RenderWorker::resizeWindow(const QSize newSize) {
+    cameraSettings.width = newSize.width();
+    cameraSettings.height = newSize.height();
+    camera.updateCameraSettings(cameraSettings);
 }

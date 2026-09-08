@@ -4,9 +4,16 @@
 RenderController::RenderController(MainWindow* parent)
     : QObject(parent), mainWindow(parent)
 {
-    worker = std::make_unique<RenderWorker>();
+    worker = std::make_unique<RenderWorker>(parent->size());
 
     worker->moveToThread(&renderingThread);
+
+    connect(
+        parent,
+        &MainWindow::sizeChanged,
+        worker.get(),
+        &RenderWorker::resizeWindow
+    );
 
     connect(
         &renderingThread,
