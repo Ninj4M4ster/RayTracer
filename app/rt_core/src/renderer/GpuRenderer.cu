@@ -4,26 +4,74 @@
 #include <cuda/cmath>
 #include <limits>
 
-RT_G void renderPixel(
-    Color *frameBuff,
-    int width,
-    int height,
-    GpuScene scene,
-    Camera camera)
+GpuRenderer::~GpuRenderer()
 {
-    int workIndex = threadIdx.x + blockIdx.x * blockDim.x;
+    if (deviceFrameBuffer)
+    {
+        cudaFree(deviceFrameBuffer);
+    }
+    capacity = 0;
+}
 
-    if (workIndex >= width * height)
+void GpuRenderer::resize(int width, int height)
+{
+    const std::size_t required =
+        static_cast<std::size_t>(width) *
+        static_cast<std::size_t>(height) *
+        sizeof(Color);
+
+    if (required <= capacity)
         return;
 
-    int x = workIndex % width;
-    int y = workIndex / width;
+    if (deviceFrameBuffer)
+    {
+        cudaError_t err = cudaFree(deviceFrameBuffer);
+
+        if (err != cudaSuccess)
+        {
+            throw std::runtime_error(
+                std::string("cudaFree failed: ") +
+                cudaGetErrorString(err));
+        }
+
+        deviceFrameBuffer = nullptr;
+        capacity = 0;
+    }
+
+    cudaError_t err = cudaMalloc(
+        reinterpret_cast<void **>(&deviceFrameBuffer),
+        required);
+
+    if (err != cudaSuccess)
+    {
+        throw std::runtime_error(
+            std::string("cudaMalloc framebuffer failed: ") +
+            cudaGetErrorString(err));
+    }
+
+    capacity = required;
+}
+
+RT_G void renderPixel(
+    Color *__restrict__ frameBuff,
+    int width,
+    int height,
+    const GpuSceneView scene,
+    const Camera camera)
+{
+    const int x = threadIdx.x + blockIdx.x * blockDim.x;
+    const int y = threadIdx.y + blockIdx.y * blockDim.y;
+
+    if (x >= width || y >= height)
+        return;
+
+    const int workIndex = y * width + x;
 
     auto ray = camera.generateRay(x, y);
 
     float min_t = 100000000.0f;
     ScalarVector3 minNormal;
-    Sphere *minObject;
+    Sphere *minObject = nullptr;
     bool hit = false;
 
     if (scene.spheres)
@@ -32,7 +80,7 @@ RT_G void renderPixel(
         {
             float t;
             ScalarVector3 normal;
-            if (scene.spheres[i].intersect(ray, t, normal) && t > 0 && t < min_t)
+            if (scene.spheres[i].intersect(ray, t, normal) && t > 0.f && t < min_t)
             {
                 hit = true;
                 minNormal = normal;
@@ -48,7 +96,7 @@ RT_G void renderPixel(
         if (light)
         {
             const auto hitPose = ray.pointOfIntersection(min_t);
-            const auto dirToLight = ((light->position - hitPose) / (light->position - hitPose).length()).normalized();
+            const auto dirToLight = (light->position - hitPose).normalized();
             const auto intensity = std::max(0.0f, minNormal.dot(dirToLight));
             frameBuff[workIndex] = intensity * minObject->color;
         }
@@ -74,91 +122,56 @@ void GpuRenderer::render(
     const GpuScene &scene,
     const Camera &camera)
 {
-    Color *deviceFrameBuffer = nullptr;
-
-    const std::size_t frameBufferSize =
-        static_cast<std::size_t>(frameBuffer.width) *
-        frameBuffer.height *
-        sizeof(Color);
-
-    cudaError_t err;
-
-    err = cudaMalloc(
-        reinterpret_cast<void **>(&deviceFrameBuffer),
-        frameBufferSize);
-
-    if (err != cudaSuccess)
-    {
-        std::cerr << "cudaMalloc: "
-                  << cudaGetErrorString(err) << '\n';
-        return;
-    }
-
-    constexpr int threads = 256;
+    resize(frameBuffer.width, frameBuffer.height);
 
     const int pixels =
         frameBuffer.width * frameBuffer.height;
 
-    const int blocks =
-        (pixels + threads - 1) / threads;
+    if (pixels <= 0)
+        return;
 
-    std::cout
-        << "Launching kernel: "
-        << blocks << " blocks, "
-        << threads << " threads, "
-        << pixels << " pixels\n";
+    constexpr int threadsX = 16;
+    constexpr int threadsY = 16;
+    const dim3 threads(threadsX, threadsY);
+    const dim3 blocks(
+        (frameBuffer.width + threadsX - 1) / threadsX,
+        (frameBuffer.height + threadsY - 1) / threadsY);
 
     renderPixel<<<blocks, threads>>>(
         deviceFrameBuffer,
         frameBuffer.width,
         frameBuffer.height,
-        scene,
+        scene.view(),
         camera);
 
-    // Check launch itself.
-    err = cudaGetLastError();
+    cudaError_t err = cudaGetLastError();
 
     if (err != cudaSuccess)
     {
-        std::cerr << "Kernel launch: "
-                  << cudaGetErrorString(err) << '\n';
-
-        cudaFree(deviceFrameBuffer);
-        return;
+        throw std::runtime_error(
+            std::string("Kernel launch failed: ") +
+            cudaGetErrorString(err));
     }
 
-    // Check execution.
-    err = cudaDeviceSynchronize();
-
-    if (err != cudaSuccess)
-    {
-        std::cerr << "Kernel execution: "
-                  << cudaGetErrorString(err) << '\n';
-
-        cudaFree(deviceFrameBuffer);
-        return;
-    }
-
-    err = cudaMemcpy(
+    err = cudaMemcpyAsync(
         frameBuffer.pixels.data(),
         deviceFrameBuffer,
-        frameBufferSize,
+        static_cast<std::size_t>(pixels) * sizeof(Color),
         cudaMemcpyDeviceToHost);
 
     if (err != cudaSuccess)
     {
-        std::cerr << "cudaMemcpy: "
-                  << cudaGetErrorString(err) << '\n';
-
-        cudaFree(deviceFrameBuffer);
-        return;
+        throw std::runtime_error(
+            std::string("cudaMemcpyAsync failed: ") +
+            cudaGetErrorString(err));
     }
 
-    err = cudaFree(deviceFrameBuffer);
+    err = cudaStreamSynchronize(0);
 
     if (err != cudaSuccess)
     {
-        std::cerr << "cudaFree: "
-                  << cudaGetErrorString(err) << '\n';
+        throw std::runtime_error(
+            std::string("Kernel execution failed: ") +
+            cudaGetErrorString(err));
     }
 }

@@ -4,8 +4,8 @@
 RT_HD
 Ray Camera::generateRay(std::uint32_t x, std::uint32_t y) const
 {
-    auto u = (static_cast<float>(x) + 0.5) / static_cast<float>(cameraSettings.width);
-    auto v = (static_cast<float>(y) + 0.5) / static_cast<float>(cameraSettings.height);
+    auto u = (static_cast<float>(x) + 0.5f) / static_cast<float>(cameraSettings.width);
+    auto v = (static_cast<float>(y) + 0.5f) / static_cast<float>(cameraSettings.height);
     auto px = (2.0 * u - 1.0) * viewportWidth / 2.0;
     auto py = (1.0 - 2.0 * v) * viewportHeight / 2.0;
 
@@ -29,7 +29,8 @@ std::vector<Ray> Camera::generateAllImageRays()
     {
         for (std::uint32_t x = 0; x < cameraSettings.width; ++x)
         {
-            rays.push_back(generateRay(x, y));
+            rays.at(y * cameraSettings.width + x) =
+                generateRay(x, y);
         }
     }
 

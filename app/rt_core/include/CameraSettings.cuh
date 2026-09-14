@@ -6,5 +6,5 @@ struct CameraSettings
 {
     std::uint32_t width;
     std::uint32_t height;
-    double fov;
+    float fov;
 };

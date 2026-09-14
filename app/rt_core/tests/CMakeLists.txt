@@ -1,5 +1,6 @@
 add_executable(raytracer_tests
     TestCamera.cpp
+    TestFrameBuffer.cpp
     TestVec3.cpp
 )
 

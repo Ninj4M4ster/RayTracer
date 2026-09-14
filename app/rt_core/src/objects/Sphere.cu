@@ -1,20 +1,37 @@
 #include <objects/Sphere.cuh>
 
-RT_HD bool Sphere::intersect(const Ray &ray, float &t, ScalarVector3 &normal)
+RT_HD
+bool Sphere::intersect(
+    const Ray &ray,
+    float &t,
+    ScalarVector3 &normal) const
 {
-    ScalarVector3 L = ray.origin - position;
-    float a = ray.direction.dot(ray.direction);
-    float b = 2.0f * ray.direction.dot(L);
-    float c = L.dot(L) - (radius * radius);
+    const ScalarVector3 oc = ray.origin - position;
 
-    if (float delta = (b * b) - 4.0 * a * c; delta > 0.0)
-    {
-        delta = sqrtf(delta);
-        float t1 = (-b - delta) / (2.0f * a);
-        float t2 = (-b + delta) / (2.0f * a);
-        t = std::min(t1, t2);
-        normal = (ray.pointOfIntersection(t) - position) / radius;
-        return true;
-    }
-    return false;
+    const float b = ray.direction.dot(oc);
+    const float c = oc.dot(oc) - radius * radius;
+
+    const float h = b * b - c;
+
+    if (h < 0.0f)
+        return false;
+
+    const float sqrtH = sqrtf(h);
+
+    float tHit = -b - sqrtH;
+
+    if (tHit <= 0.0f)
+        tHit = -b + sqrtH;
+
+    if (tHit <= 0.0f)
+        return false;
+
+    t = tHit;
+
+    const ScalarVector3 hit =
+        ray.origin + ray.direction * t;
+
+    normal = (hit - position) / radius;
+
+    return true;
 }

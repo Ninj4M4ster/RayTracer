@@ -1,9 +1,10 @@
 #pragma once
 
 #include <QObject>
+#include <QSize>
 #include <renderer/IRenderer.cuh>
 #include <renderer/GpuRenderer.cuh>
-#include <QSize>
+#include <GpuScene.cuh>
 
 class RenderWorker : public QObject {
     Q_OBJECT
@@ -14,6 +15,9 @@ public slots:
     void initialize();
     void render();
     void resizeWindow(const QSize);
+
+private:
+    void scheduleNextRender();
 
 signals:
     void initialized();
@@ -26,4 +30,10 @@ private:
     std::unique_ptr<GpuRenderer> gpuRenderer;
     CameraSettings cameraSettings;
     Camera camera;
+    Scene scene;
+    GpuScene gpuScene;
+    FrameBuffer frameBuffer;
+    bool renderQueued = false;
+    bool rendering = false;
+    bool shuttingDown = false;
 };

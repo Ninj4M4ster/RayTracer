@@ -10,7 +10,7 @@ public:
     {
         objectType = ObjectType::SPHERE;
     }
-    RT_HD bool intersect(const Ray &ray, float &t, ScalarVector3 &normal);
+    RT_HD bool intersect(const Ray &ray, float &t, ScalarVector3 &normal) const;
 
     float radius;
 };

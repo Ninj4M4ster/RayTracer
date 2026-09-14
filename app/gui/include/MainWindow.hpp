@@ -12,7 +12,7 @@ public:
     void resizeEvent (QResizeEvent*) override;
 
 public slots:
-    void display(QImage);
+    void display(const QImage&);
 
 signals:
     void displayed();

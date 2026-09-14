@@ -68,6 +68,39 @@ GpuScene::GpuScene(const Scene &scene)
     }
 }
 
+GpuScene::GpuScene(GpuScene &&other) noexcept
+    : spheres(other.spheres),
+      light(other.light),
+      sphereCount(other.sphereCount)
+{
+    other.spheres = nullptr;
+    other.light = nullptr;
+    other.sphereCount = 0;
+}
+
+GpuScene &GpuScene::operator=(GpuScene &&other) noexcept
+{
+    if (this == &other)
+        return *this;
+
+    free();
+
+    spheres = other.spheres;
+    light = other.light;
+    sphereCount = other.sphereCount;
+
+    other.spheres = nullptr;
+    other.light = nullptr;
+    other.sphereCount = 0;
+
+    return *this;
+}
+
+GpuScene::~GpuScene()
+{
+    free();
+}
+
 void GpuScene::free()
 {
     if (spheres)

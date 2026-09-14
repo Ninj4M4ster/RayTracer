@@ -22,7 +22,7 @@ public:
           upVec{this->orientation.rotate({0., 1., 0.})},
           cameraSettings{settings}
     {
-        aspectRatio = static_cast<double>(cameraSettings.width) / static_cast<double>(cameraSettings.height);
+        aspectRatio = static_cast<float>(cameraSettings.width) / static_cast<float>(cameraSettings.height);
         viewportHeight = 2.0 * tanf(cameraSettings.fov / 2.0);
         viewportWidth = aspectRatio * viewportHeight;
     }
@@ -30,7 +30,7 @@ public:
     void updateCameraSettings(const CameraSettings settings)
     {
         cameraSettings = settings;
-        aspectRatio = static_cast<double>(cameraSettings.width) / static_cast<double>(cameraSettings.height);
+        aspectRatio = static_cast<float>(cameraSettings.width) / static_cast<float>(cameraSettings.height);
         viewportHeight = 2.0 * tanf(cameraSettings.fov / 2.0);
         viewportWidth = aspectRatio * viewportHeight;
     }

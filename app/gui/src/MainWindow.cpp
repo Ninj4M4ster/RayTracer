@@ -7,10 +7,11 @@ MainWindow::MainWindow() : renderController(this), centralLabel{nullptr} {
     centralLabel = new QLabel(this);
     centralLabel->setSizePolicy(QSizePolicy::Ignored,
                                 QSizePolicy::Ignored);
+    centralLabel->setAlignment(Qt::AlignCenter);
     setCentralWidget(centralLabel);
 }
 
-void MainWindow::display(QImage image)
+void MainWindow::display(const QImage& image)
 {
     centralLabel->setPixmap(QPixmap::fromImage(image));
     emit displayed();

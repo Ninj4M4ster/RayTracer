@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <FrameBuffer.cuh>
 #include <math/Vec3.cuh>
 
 TEST(TestVec, Addition)
@@ -13,3 +14,4 @@ TEST(TestVec, Addition)
     EXPECT_FLOAT_EQ(c.y, 7.f);
     EXPECT_FLOAT_EQ(c.z, 9.f);
 }
+

@@ -36,19 +36,10 @@ RenderController::RenderController(MainWindow* parent)
         &MainWindow::display
     );
 
-    connect(
-        mainWindow,
-        &MainWindow::displayed,
-        worker.get(),
-        &RenderWorker::render
-    );
-
     renderingThread.start();
 }
 
 RenderController::~RenderController() {
-    // renderTimer.stop();
-
     if (renderingThread.isRunning()) {
         renderingThread.quit();
         renderingThread.wait();
